@@ -4,9 +4,9 @@ using EmployeeProjectApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace EmployeeProjectApi.Controllers;
+namespace EmployeeProjectApi.Controllers.V2;
 [ApiController]
-[ApiVersion("1.0")]
+[ApiVersion("2.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 public class ProjectsController : ControllerBase
 {
@@ -94,16 +94,17 @@ public class ProjectsController : ControllerBase
 
     // GET /api/projects/3/employees
     [HttpGet("{id:int}/employees")]
-    public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetEmployees(int id)
+    public async Task<ActionResult<IEnumerable<EmployeeDtoV2>>> GetEmployees(int id)
     {
         var employees = await _db.EmployeeProjects
             .Where(ep => ep.ProjectId == id)
-            .Select(ep => new EmployeeDto(
+            .Select(ep => new EmployeeDtoV2(
                 ep.Employee.Id,
                 ep.Employee.Name,
                 ep.Employee.Email,
                 ep.Employee.Department,
-                ep.Employee.DateOfJoining))
+                ep.Employee.DateOfJoining,
+                ep.Employee.Position))
             .ToListAsync();
 
         return Ok(employees);

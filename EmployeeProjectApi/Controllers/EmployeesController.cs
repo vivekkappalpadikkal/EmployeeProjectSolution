@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace EmployeeProjectApi.Controllers;
 [ApiVersion("1.0")]
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v{version:apiVersion}/[controller]")]
 [Authorize]
 public class EmployeesController : ControllerBase
 {
@@ -17,22 +17,6 @@ public class EmployeesController : ControllerBase
     public EmployeesController(AppDbContext db) => _db = db;
 
     // GET /api/employees?page=1&pageSize=10
-    //[HttpGet]
-    //public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetAll(
-    //    int page = 1, int pageSize = 10)
-    //{
-    //    var query = _db.Employees
-    //                   .OrderBy(e => e.Id)
-    //                   .Skip((page - 1) * pageSize)
-    //                   .Take(pageSize);
-
-    //    var data = await query
-    //        .Select(e => new EmployeeDto(e.Id, e.Name, e.Email,
-    //                                     e.Department, e.DateOfJoining))
-    //        .ToListAsync();
-
-    //    return Ok(data);
-    //}
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetAll([FromQuery] QueryParameters qp)

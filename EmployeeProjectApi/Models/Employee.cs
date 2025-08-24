@@ -8,4 +8,6 @@ public class Employee
     public string Department { get; set; } = null!;
     public DateTime DateOfJoining { get; set; }
     public ICollection<EmployeeProject> EmployeeProjects { get; set; } = new List<EmployeeProject>();
+    public string Position { get; set; } = null!;    // add this
+
 }

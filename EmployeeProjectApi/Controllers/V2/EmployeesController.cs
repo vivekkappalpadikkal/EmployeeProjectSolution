@@ -6,41 +6,25 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace EmployeeProjectApi.Controllers;
+namespace EmployeeProjectApi.Controllers.V2;
 [ApiVersion("2.0")]
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v{version:apiVersion}/[controller]")]
 [Authorize]
-public class EmployeesV2Controller : ControllerBase
+public class EmployeesController : ControllerBase
 {
     private readonly AppDbContext _db;
-    public EmployeesV2Controller(AppDbContext db) => _db = db;
+    public EmployeesController(AppDbContext db) => _db = db;
 
     // GET /api/employees?page=1&pageSize=10
-    //[HttpGet]
-    //public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetAll(
-    //    int page = 1, int pageSize = 10)
-    //{
-    //    var query = _db.Employees
-    //                   .OrderBy(e => e.Id)
-    //                   .Skip((page - 1) * pageSize)
-    //                   .Take(pageSize);
-
-    //    var data = await query
-    //        .Select(e => new EmployeeDto(e.Id, e.Name, e.Email,
-    //                                     e.Department, e.DateOfJoining))
-    //        .ToListAsync();
-
-    //    return Ok(data);
-    //}
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetAll([FromQuery] QueryParameters qp)
+    public async Task<ActionResult<IEnumerable<EmployeeDtoV2>>> GetAll([FromQuery] QueryParameters qp)
     {
         var list = await _db.Employees
                             .Apply(qp)
-                            .Select(e => new EmployeeDto(e.Id, e.Name, e.Email,
-                                                         e.Department, e.DateOfJoining))
+                            .Select(e => new EmployeeDtoV2(e.Id, e.Name, e.Email,
+                                                         e.Department, e.DateOfJoining, e.Position))
                             .ToListAsync();
 
         return Ok(list);
@@ -48,17 +32,17 @@ public class EmployeesV2Controller : ControllerBase
 
     // GET /api/employees/5
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<EmployeeDto>> Get(int id)
+    public async Task<ActionResult<EmployeeDtoV2>> Get(int id)
     {
         var e = await _db.Employees.FindAsync(id);
         if (e is null) return NotFound();
-        return new EmployeeDto(e.Id, e.Name, e.Email,
-                               e.Department, e.DateOfJoining);
+        return new EmployeeDtoV2(e.Id, e.Name, e.Email,
+                               e.Department, e.DateOfJoining, e.Position);
     }
 
     // POST /api/employees
     [HttpPost]
-    public async Task<ActionResult<EmployeeDto>> Create(EmployeeDto dto)
+    public async Task<ActionResult<EmployeeDtoV2>> Create(EmployeeDtoV2 dto)
     {
         var entity = new Employee
         {
@@ -70,13 +54,13 @@ public class EmployeesV2Controller : ControllerBase
         _db.Employees.Add(entity);
         await _db.SaveChangesAsync();
         return CreatedAtAction(nameof(Get), new { id = entity.Id },
-            new EmployeeDto(entity.Id, entity.Name, entity.Email,
-                            entity.Department, entity.DateOfJoining));
+            new EmployeeDtoV2(entity.Id, entity.Name, entity.Email,
+                            entity.Department, entity.DateOfJoining, entity.Position));
     }
 
     // PUT /api/employees/5
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> Update(int id, EmployeeDto dto)
+    public async Task<IActionResult> Update(int id, EmployeeDtoV2 dto)
     {
         if (id != dto.Id) return BadRequest();
         var e = await _db.Employees.FindAsync(id);
@@ -86,6 +70,7 @@ public class EmployeesV2Controller : ControllerBase
         e.Email = dto.Email;
         e.Department = dto.Department;
         e.DateOfJoining = dto.DateOfJoining;
+        e.Position = dto.Position; // ← new field
 
         await _db.SaveChangesAsync();
         return NoContent();

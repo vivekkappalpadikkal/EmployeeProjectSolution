@@ -5,8 +5,8 @@ using System.Security.Claims;
 using System.Text;
 using EmployeeProjectApi.Dtos;
 
-namespace EmployeeProjectApi.Controllers;
-[ApiVersion("1.0")]
+namespace EmployeeProjectApi.Controllers.V2;
+[ApiVersion("2.0")]
 [ApiController]
 [Route("api/v{version:apiVersion}/[controller]")]
 public class AuthController : ControllerBase
