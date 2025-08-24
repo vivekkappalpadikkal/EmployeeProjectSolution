@@ -49,7 +49,8 @@ public class EmployeesController : ControllerBase
             Name = dto.Name,
             Email = dto.Email,
             Department = dto.Department,
-            DateOfJoining = dto.DateOfJoining
+            DateOfJoining = dto.DateOfJoining,
+            Position = dto.Position // ← new field
         };
         _db.Employees.Add(entity);
         await _db.SaveChangesAsync();
